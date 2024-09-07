@@ -1,37 +1,39 @@
 """
-Reads in a CSV of keywords and deletes all files
-and folders with those keywords.
+Reads in a CSV of keywords and iterates through
+directories, deleting all files and folders with
+those keywords, and moving the remaining files
+with specified extensions to a final directory.
 """
 import os
 import shutil
 import random
 import csv
 
-def read_words_from_csv(KEYWORD_CSV):
+def read_words_from_csv(csv_path):
     """
-    Reads in a CSV of keywords
+    Reads in a CSV of keywords.
     """
     words = []
     try:
-        with open(KEYWORD_CSV, mode='r', newline='') as file:
+        with open(csv_path, mode='r', newline='') as file:
             reader = csv.reader(file)
             for row in reader:
                 words.extend(row)
         return words
     except FileNotFoundError:
-        print(f"CSV file not found: {KEYWORD_CSV}")
+        print(f"CSV file not found: {csv_path}")
         return []
     except Exception as e:
         print(f"An error occurred while reading the CSV file: {e}")
         return []
 
-def search_and_delete(BASE_DIR, words):
+def search_and_delete(base_directory, words):
     """
     Iterate through a base directory and all sub-directories
-    for files and directories with keywords and delete them.
+    delete files/directories with those keyword.
     """
     try:
-        for root, dirs, files in os.walk(BASE_DIR, topdown=False):
+        for root, dirs, files in os.walk(base_directory, topdown=False):
             for file_name in files:
                 if any(word.lower() in file_name.lower() for word in words):
                     file_path = os.path.join(root, file_name)
@@ -53,27 +55,27 @@ def search_and_delete(BASE_DIR, words):
     except Exception as e:
         print(f"An error occurred while searching the directory: {e}")
 
-def move_files_with_extensions(source_directory, DEST_DIR, extensions):
+def move_files_with_extensions(source_directory, destination_directory, extensions):
     """
     Iterate through a base directory and all sub-directories
     for files with specific extensions and move them to 
     a different directory.
     """
     try:
-        if not os.path.exists(DEST_DIR):
-            os.makedirs(DEST_DIR)
+        if not os.path.exists(destination_directory):
+            os.makedirs(destination_directory)
 
         for root, dirs, files in os.walk(source_directory):
             for file_name in files:
                 if any(file_name.lower().endswith(ext) for ext in extensions):
                     source_file_path = os.path.join(root, file_name)
-                    destination_file_path = os.path.join(DEST_DIR, file_name)
+                    destination_file_path = os.path.join(destination_directory, file_name)
 
                     # If a file with the same name exists, add a random 5-digit suffix
                     if os.path.exists(destination_file_path):
                         base_name, ext = os.path.splitext(file_name)
                         random_suffix = random.randint(10000, 99999)
-                        destination_file_path = os.path.join(DEST_DIR, f"{base_name}_{random_suffix}{ext}")
+                        destination_file_path = os.path.join(destination_directory, f"{base_name}_{random_suffix}{ext}")
 
                     try:
                         shutil.move(source_file_path, destination_file_path)
@@ -104,23 +106,26 @@ def move_files_with_extensions(source_directory, DEST_DIR, extensions):
     except Exception as e:
         print(f"An error occurred while moving files: {e}")
 
-def main(KEYWORD_CSV, BASE_DIR, DEST_DIR):
+def main(csv_path, base_directory, destination_directory):
     """
     Main function to read in a CSV to create a keyword array,
     delete any files/directories with those keywords, then move all remaining
     files with specific extensions to a new directory.
     """
-    words = read_words_from_csv(KEYWORD_CSV)
+    words = read_words_from_csv(csv_path)
     if words:
-        search_and_delete(BASE_DIR, words)
+        search_and_delete(base_directory, words)
     else:
         print("No words found to search for.")
 
     extensions = ['.mp4', '.mov', '.mkv', '.avi', '.jpg', '.png']
-    move_files_with_extensions(BASE_DIR, DEST_DIR, extensions)
+    move_files_with_extensions(base_directory, destination_directory, extensions)
 
 if __name__ == "__main__":
-    KEYWORD_CSV = r"C:\\test\\keywords.csv"
-    BASE_DIR = r"C:\\test\\TestFolder"
-    DEST_DIR = r"C:\\test\\Destination"
-    main(KEYWORD_CSV, BASE_DIR, DEST_DIR)
+    """
+    Initalize varaibles and trigger the main function.
+    """
+    csv_path = r"C:\\test\\keywords.csv"
+    base_directory = r"C:\\test\\Source"
+    destination_directory = r"C:\\test\\Destination"
+    main(csv_path, base_directory, destination_directory)
