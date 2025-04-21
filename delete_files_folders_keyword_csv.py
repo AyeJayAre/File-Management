@@ -71,12 +71,9 @@ def move_files_with_extensions(source_directory, destination_directory, extensio
                     source_file_path = os.path.join(root, file_name)
                     destination_file_path = os.path.join(destination_directory, file_name)
 
-                    # If a file with the same name exists, add a random 5-digit suffix
+                    # If a file with the same name exists, skip moving the file
                     if os.path.exists(destination_file_path):
-                        base_name, ext = os.path.splitext(file_name)
-                        random_suffix = random.randint(10000, 99999)
-                        destination_file_path = os.path.join(destination_directory, f"{base_name}_{random_suffix}{ext}")
-
+                        continue
                     try:
                         shutil.move(source_file_path, destination_file_path)
                         print(f"Moved file: {source_file_path} to {destination_file_path}")
