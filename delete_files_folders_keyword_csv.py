@@ -78,7 +78,7 @@ def move_files_with_extensions(source_directory, destination_directory, extensio
                         shutil.move(source_file_path, destination_file_path)
                         print(f"Moved file: {source_file_path} to {destination_file_path}")
                     except Exception as e:
-                        print(f"Failed to move file {source_file_path}: {e}")
+                    print(f"Failed to move file {source_file_path}: {e}")
 
         # After moving the files, delete all remaining files in the source directory
         for root, dirs, files in os.walk(source_directory):
